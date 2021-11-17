@@ -3,17 +3,24 @@
 
     Constant values for churn_library module
 """
-DATA_FILE_PATH = './data/BankChurners.csv'
-LOG_FILE_PATH = './logs/churn_library.log'
-#RESULTS_FILE_PATH ='./images/results'
-LOGISTIC_RESULTS = './images/results/logistic_results.png'
-RF_RESULTS = './images/results/rf_results.png'
-ROC_CURVE_RESULT = './images/results/roc_curve_result.png'
-FEATURE_IMPORTANCES = './images/results/feature_importances.png'
-RFC_MODEL = './models/rfc_model.pkl'
-LR_MODEL = './models/logistic_model.pkl'
+data_file_path = './data/BankChurners.csv'
+log_file_path = './logs/churn_library.log'
+#results_pth ='./images/results'
+logistic_results = './images/results/logistic_results.png'
+rfc_results = './images/results/rf_results.png'
+roc_curve_result = './images/results/roc_curve_result.png'
+feature_importances = './images/results/feature_importances.png'
+rfc_model = './models/rfc_model.pkl'
+lr_model = './models/logistic_model.pkl'
+churn_distribution = './images/eda/churn_distribution.png'
+customer_age_distribution = './images/eda/customer_age_distribution.png'
+heatmap = './images/eda/churn_distribution.png'
+material_status_distribution = './images/eda/material_status_distribution.png'
+total_transation_distribution = './images/eda/total_transation_distribution.png'
 
-CAT_COLUMNS = [
+
+
+cat_columns = [
     'Gender',
     'Education_Level',
     'Marital_Status',
@@ -21,7 +28,7 @@ CAT_COLUMNS = [
     'Card_Category'                
 ]
 
-QUANT_COLUMNS = [
+quant_columns = [
     'Customer_Age',
     'Dependent_count', 
     'Months_on_book',
@@ -38,7 +45,7 @@ QUANT_COLUMNS = [
     'Avg_Utilization_Ratio'
 ]
 
-KEEP_COLUMNS = ['Customer_Age', 'Dependent_count', 'Months_on_book',
+keep_columns = ['Customer_Age', 'Dependent_count', 'Months_on_book',
              'Total_Relationship_Count', 'Months_Inactive_12_mon',
              'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
              'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
