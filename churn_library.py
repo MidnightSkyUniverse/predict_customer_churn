@@ -6,22 +6,19 @@
     Author: Ali Binkowska
 '''
 # import libraries
-#from sklearn.preprocessing import normalize, OneHotEncoder
-# from constants import CAT_COLUMNS, KEEP_COLUMNS, DATA_FILE_PATH, LOGISTIC_RESULTS, \
-#    RF_RESULTS, ROC_CURVE_RESULT, FEATURE_IMPORTANCES, RFC_MODEL, LR_MODEL
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import plot_roc_curve, classification_report
-#import shap
+import shap
 import joblib
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-# Import constant values
-import constant
+# Import pcfg values
+import projectconfig as pcfg
 # Initiate seaborn theme
 sns.set()
 
@@ -49,7 +46,36 @@ def perform_eda(df):
     output:
             None
     '''
-    pass
+    # Histogram - customer churn column
+    plt.figure(figsize=(20,10)) 
+    df['Churn'].hist(); 
+    plt.title("Histogram - Customer Churn")
+    plt.savefig(pcfg.churn_distribution)
+
+    # Histogram - customer agge distribution
+    plt.figure(figsize=(20,10)) 
+    df['Customer_Age'].hist();
+    plt.title("Histogram - Customer Age")
+    plt.savefig(pcfg.customer_age_distribution)
+
+    # Bar chart - Material Status category
+    plt.figure(figsize=(20,10)) 
+    df.Marital_Status.value_counts('normalize').plot(kind='bar');
+    plt.title("Bar chart - Marital status")
+    plt.savefig(pcfg.material_status_distribution)
+   
+    # Distribution chart - Total transations
+    plt.figure(figsize=(20,10)) 
+    sns.displot(df['Total_Trans_Ct']); 
+    plt.title("Distribution chart - Total transactions")
+    plt.savefig(pcfg.total_transation_distribution)
+
+    # Heatmap - all features
+    plt.figure(figsize=(20,10)) 
+    sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths = 2)
+    plt.title("Heatmap of all the features")
+    plt.savefig(pcfg.heatmap)
+
 
 
 def add_churn_column(df):
@@ -79,6 +105,7 @@ def encoder_helper(df, category_lst, response):
     output:
             df: pandas dataframe with new columns for
     '''
+    X = pd.DataFrame()
     for col in category_lst:
         col_lst = []
         col_groups = df.groupby(col).mean()['Churn']
@@ -88,7 +115,10 @@ def encoder_helper(df, category_lst, response):
         new_col = col + '_Churn'
         df[new_col] = col_lst
 
-    return df
+    X[pcfg.keep_columns] = df[pcfg.keep_columns]
+    y = df['Churn']
+
+    return (X,y)
 
 
 def one_hot_encoder(df, category_lst, response):
@@ -113,7 +143,7 @@ def one_hot_encoder(df, category_lst, response):
     return encoded_df
 
 
-def perform_feature_engineering(df, response):
+def perform_feature_engineering(X,y, response):
     '''
     input:
               df: pandas dataframe
@@ -126,10 +156,7 @@ def perform_feature_engineering(df, response):
               y_train: y training data
               y_test: y testing data
     '''
-    y = df['Churn']
-    X = pd.DataFrame()
 
-    X[constant.KEEP_COLUMNS] = df[constant.KEEP_COLUMNS]
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42)
 
@@ -248,7 +275,7 @@ def feature_importance_plot(model, X_data, output_pth):
 
     # Create plot title
     plt.title("Feature Importance")
-    plt.ylabel("Importance")
+    plt.ylabel('Importance')
 
     # Add bars
     plt.bar(range(X_data.shape[1]), importances[indices])
@@ -284,6 +311,15 @@ def roc_curve_plot(model_rf, model_lr, X_test, y_test, output_pth):
     plt.savefig(output_pth)
 
 
+def explainer_plot(model, X_test, plot_type="bar"):
+    '''
+    '''
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(X_test)
+    shap.summary_plot(shap_values, X_test, plot_type=plot_type, show=False)
+    plt.title("Explainer bar chart")
+    plt.savefig(pcfg.explainer)
+
 def save_model(model, output_pth):
     '''
     saves model to ./models as .pkl file
@@ -315,7 +351,7 @@ def train_models(X_train, X_test, y_train, y_test):
                                 y_test,
                                 y_train_preds,
                                 y_test_preds,
-                                model_name, constant.RF_RESULTS)
+                                model_name, pcfg.rfc_results)
 
     model_lr = fit_logistic_regression(X_train, y_train)
     y_train_preds, y_test_preds = predict_model(model_lr, X_train, X_test)
@@ -325,30 +361,33 @@ def train_models(X_train, X_test, y_train, y_test):
                                 y_test,
                                 y_train_preds,
                                 y_test_preds,
-                                model_name, constant.LOGISTIC_RESULTS)
+                                model_name, pcfg.logistic_results)
 
     roc_curve_plot(
         model_rfc,
         model_lr,
         X_test,
         y_test,
-        constant.ROC_CURVE_RESULT)
+        pcfg.roc_curve_result)
+    
+    # Save explainer bar plot
+    explainer_plot(model_rfc, X_test, plot_type="bar")
 
-    save_model(model_lr, constant.LR_MODEL)
-    save_model(model_rfc, constant.RFC_MODEL)
+    save_model(model_lr, pcfg.lr_model)
+    save_model(model_rfc, pcfg.rfc_model)
 
 
 if __name__ == '__main__':
-    df = import_data(constant.DATA_FILE_PATH)
-    print(df.head())
-    # perform_eda(df)
+    df = import_data(pcfg.data_file_path)
     df = add_churn_column(df)
-    df = encoder_helper(df, constant.CAT_COLUMNS, response=None)
-    X_train, X_test, y_train, y_test = perform_feature_engineering(
-        df, response=None)
+    perform_eda(df)
+    X, y  = encoder_helper(df, pcfg.cat_columns, response=None)
+    #print(X.head())
+    
+    X_train, X_test, y_train, y_test = perform_feature_engineering(X, y, response=None)
     train_models(X_train, X_test, y_train, y_test)
 
     # Save Features Importances
-    model_rfc = joblib.load(constant.RFC_MODEL)
-    feature_importance_plot(model_rfc, df, constant.FEATURE_IMPORTANCES)
+    model_rfc = joblib.load(pcfg.rfc_model)
+    feature_importance_plot(model_rfc, X, pcfg.feature_importances)
     # print(X_train.head())

@@ -17,6 +17,7 @@ customer_age_distribution = './images/eda/customer_age_distribution.png'
 heatmap = './images/eda/churn_distribution.png'
 material_status_distribution = './images/eda/material_status_distribution.png'
 total_transation_distribution = './images/eda/total_transation_distribution.png'
+explainer = './images/results/explainer.png'
 
 
 
