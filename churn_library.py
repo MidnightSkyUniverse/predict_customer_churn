@@ -50,35 +50,42 @@ def perform_eda(df):
     plt.figure(figsize=(20,10)) 
     df['Churn'].hist(); 
     plt.title("Histogram - Customer Churn")
-    plt.savefig(pcfg.churn_distribution)
+    plt.savefig(pcfg.churn_distribution, bbox_inches = 'tight')
+    plt.close("all")
 
     # Histogram - customer agge distribution
     plt.figure(figsize=(20,10)) 
     df['Customer_Age'].hist();
     plt.title("Histogram - Customer Age")
     plt.savefig(pcfg.customer_age_distribution)
+    plt.tight_layout()
+    plt.close("all")
 
     # Bar chart - Material Status category
     plt.figure(figsize=(20,10)) 
     df.Marital_Status.value_counts('normalize').plot(kind='bar');
     plt.title("Bar chart - Marital status")
     plt.savefig(pcfg.material_status_distribution)
+    plt.tight_layout()
+    plt.close("all")
    
     # Distribution chart - Total transations
     plt.figure(figsize=(20,10)) 
     sns.displot(df['Total_Trans_Ct']); 
     plt.title("Distribution chart - Total transactions")
     plt.savefig(pcfg.total_transation_distribution)
+    plt.tight_layout()
+    plt.close("all")
 
     # Heatmap - all features
     plt.figure(figsize=(20,10)) 
     sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths = 2)
     plt.title("Heatmap of all the features")
-    plt.savefig(pcfg.heatmap)
+    plt.savefig(pcfg.heatmap, bbox_inches = 'tight')
+    plt.close("all")
 
 
-
-def add_churn_column(df):
+def clean_data(df):
     '''
     add column Churn that encodes column Existing Customer with 0 and 1
     input:
@@ -88,6 +95,12 @@ def add_churn_column(df):
     '''
     df['Churn'] = df['Attrition_Flag'].apply(
         lambda val: 0 if val == "Existing Customer" else 1)
+
+    labels_to_drop = [
+        'Naive_Bayes_Classifier_Attrition_Flag_Card_Category_Contacts_Count_12_mon_Dependent_count_Education_Level_Months_Inactive_12_mon_1',
+       'Naive_Bayes_Classifier_Attrition_Flag_Card_Category_Contacts_Count_12_mon_Dependent_count_Education_Level_Months_Inactive_12_mon_2',
+       ]
+    df.drop(labels = labels_to_drop, axis=1, inplace = True)
     return df
 
 
@@ -379,11 +392,16 @@ def train_models(X_train, X_test, y_train, y_test):
 
 if __name__ == '__main__':
     df = import_data(pcfg.data_file_path)
-    df = add_churn_column(df)
+    df = clean_data(df)
+    
+    # Perform EDA analyses, store charts
     perform_eda(df)
+    
+    # Encode data
     X, y  = encoder_helper(df, pcfg.cat_columns, response=None)
     #print(X.head())
     
+    # Feature Engineering & training
     X_train, X_test, y_train, y_test = perform_feature_engineering(X, y, response=None)
     train_models(X_train, X_test, y_train, y_test)
 
