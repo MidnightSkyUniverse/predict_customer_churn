@@ -81,53 +81,8 @@ def fit_random_forest_classifier(X_train, y_train, random_state=None):
 
 
 
-def predict_model(model, X_train, X_test):
-    '''
-    predicting of given model
-    input:
-              model: model that is fitted
-              X_train: X training data
-              X_test: X testing data
-    output:
-              y_train_preds: prediction on X training data
-              y_test_preds : prediction on X testing data
-    '''
-    y_train_preds = model.predict(X_train)
-    y_test_preds = model.predict(X_test)
-
-    return (y_train_preds, y_test_preds)
 
 
-def classification_report_image(y_train,
-                                y_test,
-                                y_train_preds,
-                                y_test_preds,
-                                model_name,
-                                output_pth):
-    '''
-    produces classification report for training and testing results and stores report as image
-    in images folder
-    input:
-            y_train: training response values
-            y_test:  test response values
-            y_train_preds: training predictions from a model
-            y_test_preds: test predictions from logistic regression
-            model_name: name of a model
-            image_name: name of image to store as .png file
-    output:
-             None
-    '''
-    plt.rc('figure', figsize=(5, 5))
-    plt.text(0.01, 0.95, str(f'{model_name} Train'), {
-             'fontsize': 10}, fontproperties='monospace')
-    plt.text(0.01, 0.55, str(classification_report(y_train, y_train_preds)), {
-             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
-    plt.text(0.01, 0.45, str(f'{model_name} Test'), {
-             'fontsize': 10}, fontproperties='monospace')
-    plt.text(0.01, 0.01, str(classification_report(y_test, y_test_preds)), {
-             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
-    plt.axis('off')
-    plt.savefig(output_pth)
 
 
 def feature_importance_plot(model, X_data, output_pth):
@@ -199,16 +154,6 @@ def explainer_plot(model, X_test, plot_type="bar"):
     plt.title("Explainer bar chart")
     plt.savefig(pcfg.explainer)
 
-def save_model(model, output_pth):
-    '''
-    saves model to ./models as .pkl file
-    input:
-            model: model object
-            output_pth: path to store the model
-    output:
-             None
-    '''
-    joblib.dump(model, output_pth)
 
 
 def train_models(X_train, X_test, y_train, y_test):
@@ -262,23 +207,42 @@ if __name__ == '__main__':
 
     eda = [cls.MyFigure() for i in range(5)]
     #eda[0].plot_histogram(df, 'Churn', 'Churn histogram',pcfg.churn_distribution)
-    #eda[1].plot_histogram(df, 'Customer_Age', "Histogram - Customer Age" ,pcfg.customer_age_distribution)
+    #'Random Forest'eda[1].plot_histogram(df, 'Customer_Age', "Histogram - Customer Age" ,pcfg.customer_age_distribution)
     #eda[2].plot_chart(df, 'Marital_Status', "Bar chart - Marital status", pcfg.marital_status_distribution, 'bar')
     #eda[3].plot_distribution_chart(df, 'Total_Trans_Ct', "Distribution chart - Total transactions", pcfg.total_transation_distribution)
     #eda[4].plot_heatmap(df, 'Heatmap', pcfg.heatmap )#annot=False, cmap='Dark2_r', linewidths = 2, pth=pcfg.heatmap)
 
     encoded_data = cls.DataEncoding()
     encoded_data.encoder_helper(df, pcfg.cat_columns, pcfg.keep_columns, 'Churn')
-    feature_enging_data = cls.FeatureEngineering()
-    feature_enging_data.engineering(encoded_data.X,encoded_data.y)
+    featured_data = cls.FeatureEngineering()
+    featured_data.engineering(encoded_data.X,encoded_data.y)
     
 
     model_lr = cls.MyLogisticRegression()
-    model_lr.fit_model(feature_enging_data.X_train, feature_enging_data.y_train)    
-    y_train_preds, y_test_preds = model_lr.predict_model(feature_enging_data.X_train, feature_enging_data.X_test)
+    model_lr.fit(featured_data.X_train, featured_data.y_train)    
+    y_train_preds, y_test_preds = model_lr.predict(featured_data.X_train, featured_data.X_test)
     model_lr.save_model(pcfg.lr_model)
-   
+
+    
+    classification_figure_lr = cls.MyFigure()
+    classification_figure_lr.classification_report(model_lr.name, featured_data.y_train, featured_data.y_test, y_train_preds, y_test_preds,pcfg.logistic_results)   
+
+
+    param_grid = {
+        'n_estimators': [200, 500],
+        'max_features': ['auto', 'sqrt'],
+        'max_depth': [4, 5, 100],
+        'criterion': ['gini', 'entropy']
+    }
+
+
+    model_rfc =  cls.MyRandomForestClassifier(param_grid)
+    model_rfc.fit(featured_data.X_train, featured_data.y_train)
+    y_train_preds, y_test_preds = model_lr.predict(featured_data.X_train, featured_data.X_test)
+    model_rfc.save_model(pcfg.rfc_model)
      
+    classification_figure_rfc = cls.MyFigure()
+    classification_figure_rfc.classification_report(model_rfc.name, featured_data.y_train, featured_data.y_test, y_train_preds, y_test_preds,pcfg.rfc_results)   
 
     ''' 
     
