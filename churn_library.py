@@ -21,12 +21,11 @@ import seaborn as sns
 import projectconfig as pcfg
 # Initiate seaborn theme
 sns.set()
-
+import churn_classes as cls
 
 def import_data(pth):
     '''
     returns dataframe for the csv found at pth
-
     input:
             pth: a path to the csv
     output:
@@ -35,55 +34,6 @@ def import_data(pth):
 
     df = pd.read_csv(pth)
     return df
-
-
-def perform_eda(df):
-    '''
-    perform eda on df and save figures to images folder
-    input:
-            df: pandas dataframe
-
-    output:
-            None
-    '''
-    # Histogram - customer churn column
-    plt.figure(figsize=(20,10)) 
-    df['Churn'].hist(); 
-    plt.title("Histogram - Customer Churn")
-    plt.savefig(pcfg.churn_distribution, bbox_inches = 'tight')
-    plt.close("all")
-
-    # Histogram - customer agge distribution
-    plt.figure(figsize=(20,10)) 
-    df['Customer_Age'].hist();
-    plt.title("Histogram - Customer Age")
-    plt.savefig(pcfg.customer_age_distribution)
-    plt.tight_layout()
-    plt.close("all")
-
-    # Bar chart - Material Status category
-    plt.figure(figsize=(20,10)) 
-    df.Marital_Status.value_counts('normalize').plot(kind='bar');
-    plt.title("Bar chart - Marital status")
-    plt.savefig(pcfg.material_status_distribution)
-    plt.tight_layout()
-    plt.close("all")
-   
-    # Distribution chart - Total transations
-    plt.figure(figsize=(20,10)) 
-    sns.displot(df['Total_Trans_Ct']); 
-    plt.title("Distribution chart - Total transactions")
-    plt.savefig(pcfg.total_transation_distribution)
-    plt.tight_layout()
-    plt.close("all")
-
-    # Heatmap - all features
-    plt.figure(figsize=(20,10)) 
-    sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths = 2)
-    plt.title("Heatmap of all the features")
-    plt.savefig(pcfg.heatmap, bbox_inches = 'tight')
-    plt.close("all")
-
 
 def clean_data(df):
     '''
@@ -104,76 +54,6 @@ def clean_data(df):
     return df
 
 
-def encoder_helper(df, category_lst, response):
-    '''
-    helper function to turn each categorical column into a new column with
-    propotion of churn for each category - associated with cell 15 from the notebook
-
-    input:
-            df: pandas dataframe
-            category_lst: list of columns that contain categorical features
-            response: string of response name [optional argument that could be used
-                    for naming variables or index y column]
-
-    output:
-            df: pandas dataframe with new columns for
-    '''
-    X = pd.DataFrame()
-    for col in category_lst:
-        col_lst = []
-        col_groups = df.groupby(col).mean()['Churn']
-
-        for val in df[col]:
-            col_lst.append(col_groups.loc[val])
-        new_col = col + '_Churn'
-        df[new_col] = col_lst
-
-    X[pcfg.keep_columns] = df[pcfg.keep_columns]
-    y = df['Churn']
-
-    return (X,y)
-
-
-def one_hot_encoder(df, category_lst, response):
-    '''
-    helper function to turn each categorical column into a new column with one-hot encoder
-
-    input:
-            df: pandas dataframe
-            category_lst: list of columns that contain categorical features
-            response: string of response name [optional argument that could be used
-                    for naming variables or index y column]
-
-    output:
-            df: pandas dataframe with new columns for
-    '''
-    enc = OneHotEncoder(handle_unknown='ignore', sparse=False)
-    cols_encoded = pd.DataFrame(enc.fit_transform(df[category_lst]))
-    cols_remaining = df.drop(category_lst, axis=1)
-
-    encoded_df = pd.concat([cols_encoded, cols_remaining], axis=1)
-
-    return encoded_df
-
-
-def perform_feature_engineering(X,y, response):
-    '''
-    input:
-              df: pandas dataframe
-              response: string of response name [optional argument that could be used
-                        for naming variables or index y column]
-
-    output:
-              X_train: X training data
-              X_test: X testing data
-              y_train: y training data
-              y_test: y testing data
-    '''
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42)
-
-    return (X_train, X_test, y_train, y_test)
 
 
 def fit_random_forest_classifier(X_train, y_train, random_state=None):
@@ -199,20 +79,6 @@ def fit_random_forest_classifier(X_train, y_train, random_state=None):
 
     return cv_rfc.best_estimator_
 
-
-def fit_logistic_regression(X_train, y_train):
-    '''
-    fits Logistic Regression model
-    input:
-              X_train: X training data
-              y_train: y training data
-    output:
-              fitted model object
-    '''
-    lrc = LogisticRegression()
-    lrc.fit(X_train, y_train)
-
-    return lrc
 
 
 def predict_model(model, X_train, X_test):
@@ -393,13 +259,29 @@ def train_models(X_train, X_test, y_train, y_test):
 if __name__ == '__main__':
     df = import_data(pcfg.data_file_path)
     df = clean_data(df)
+
+    eda = [cls.MyFigure() for i in range(5)]
+    #eda[0].plot_histogram(df, 'Churn', 'Churn histogram',pcfg.churn_distribution)
+    #eda[1].plot_histogram(df, 'Customer_Age', "Histogram - Customer Age" ,pcfg.customer_age_distribution)
+    #eda[2].plot_chart(df, 'Marital_Status', "Bar chart - Marital status", pcfg.marital_status_distribution, 'bar')
+    #eda[3].plot_distribution_chart(df, 'Total_Trans_Ct', "Distribution chart - Total transactions", pcfg.total_transation_distribution)
+    #eda[4].plot_heatmap(df, 'Heatmap', pcfg.heatmap )#annot=False, cmap='Dark2_r', linewidths = 2, pth=pcfg.heatmap)
+
+    encoded_data = cls.DataEncoding()
+    encoded_data.encoder_helper(df, pcfg.cat_columns, pcfg.keep_columns, 'Churn')
+    feature_enging_data = cls.FeatureEngineering()
+    feature_enging_data.engineering(encoded_data.X,encoded_data.y)
     
-    # Perform EDA analyses, store charts
-    perform_eda(df)
+
+    model_lr = cls.MyLogisticRegression()
+    model_lr.fit_model(feature_enging_data.X_train, feature_enging_data.y_train)    
+    y_train_preds, y_test_preds = model_lr.predict_model(feature_enging_data.X_train, feature_enging_data.X_test)
+    model_lr.save_model(pcfg.lr_model)
+   
+     
+
+    ''' 
     
-    # Encode data
-    X, y  = encoder_helper(df, pcfg.cat_columns, response=None)
-    #print(X.head())
     
     # Feature Engineering & training
     X_train, X_test, y_train, y_test = perform_feature_engineering(X, y, response=None)
@@ -409,3 +291,4 @@ if __name__ == '__main__':
     model_rfc = joblib.load(pcfg.rfc_model)
     feature_importance_plot(model_rfc, X, pcfg.feature_importances)
     # print(X_train.head())
+    '''
