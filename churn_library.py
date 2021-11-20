@@ -6,227 +6,55 @@
     Author: Ali Binkowska
 '''
 # import libraries
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import plot_roc_curve, classification_report
-import shap
-import joblib
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+#from sklearn.model_selection import train_test_split
+#from sklearn.linear_model import LogisticRegression
+#from sklearn.ensemble import RandomForestClassifier
+#from sklearn.model_selection import GridSearchCV
+#from sklearn.metrics import plot_roc_curve, classification_report
+#import shap
+#import joblib
+#import pandas as pd
+#import numpy as np
+#import matplotlib.pyplot as plt
+#import seaborn as sns
 # Import pcfg values
 import projectconfig as pcfg
 # Initiate seaborn theme
-sns.set()
+#sns.set()
 import churn_classes as cls
 
-def import_data(pth):
-    '''
-    returns dataframe for the csv found at pth
-    input:
-            pth: a path to the csv
-    output:
-            df: pandas dataframe
-    '''
-
-    df = pd.read_csv(pth)
-    return df
-
-def clean_data(df):
-    '''
-    add column Churn that encodes column Existing Customer with 0 and 1
-    input:
-        df: pandas dataframe
-    output:
-        df: pandas dataframe
-    '''
-    df['Churn'] = df['Attrition_Flag'].apply(
-        lambda val: 0 if val == "Existing Customer" else 1)
-
-    labels_to_drop = [
-        'Naive_Bayes_Classifier_Attrition_Flag_Card_Category_Contacts_Count_12_mon_Dependent_count_Education_Level_Months_Inactive_12_mon_1',
-       'Naive_Bayes_Classifier_Attrition_Flag_Card_Category_Contacts_Count_12_mon_Dependent_count_Education_Level_Months_Inactive_12_mon_2',
-       ]
-    df.drop(labels = labels_to_drop, axis=1, inplace = True)
-    return df
-
-
-
-
-def fit_random_forest_classifier(X_train, y_train, random_state=None):
-    '''
-    fitting of Random Forest Classifier model
-    input:
-              X_train: X training data
-              y_train: y training data
-              random_state: random states instant, default = None
-    output:
-              fitted model object
-    '''
-    rfc = RandomForestClassifier(random_state=random_state)
-    param_grid = {
-        'n_estimators': [200, 500],
-        'max_features': ['auto', 'sqrt'],
-        'max_depth': [4, 5, 100],
-        'criterion': ['gini', 'entropy']
-    }
-
-    cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
-    cv_rfc.fit(X_train, y_train)
-
-    return cv_rfc.best_estimator_
-
-
-
-
-
-
-
-def feature_importance_plot(model, X_data, output_pth):
-    '''
-    creates and stores the feature importances in pth
-    input:
-            model: model object containing feature_importances_
-            X_data: pandas dataframe of X values
-            output_pth: path to store the figure
-
-    output:
-             None
-    '''
-    # Calculate feature importances
-    importances = model.feature_importances_
-    # Sort feature importances in descending order
-    indices = np.argsort(importances)[::-1]
-
-    # Rearrange feature names so they match the sorted feature importances
-    names = [X_data.columns[i] for i in indices]
-
-    # Create plot
-    plt.figure(figsize=(20, 5))
-
-    # Create plot title
-    plt.title("Feature Importance")
-    plt.ylabel('Importance')
-
-    # Add bars
-    plt.bar(range(X_data.shape[1]), importances[indices])
-
-    # Add feature names as x-axis labels
-    plt.xticks(range(X_data.shape[1]), names, rotation=90)
-
-    # Save figure
-    plt.savefig(output_pth)
-
-
-def roc_curve_plot(model_rf, model_lr, X_test, y_test, output_pth):
-    '''
-    creates and stores the feature importances in pth
-    input:
-            model: model object containing feature_importances_
-            X_data: pandas dataframe of X values
-            output_pth: path to store the figure
-
-    output:
-             None
-    '''
-    lrc_plot = plot_roc_curve(model_lr, X_test, y_test)
-    plt.figure(figsize=(15, 8))
-    ax = plt.gca()
-    rfc_disp = plot_roc_curve(
-        model_rf,
-        X_test,
-        y_test,
-        ax=ax,
-        alpha=0.8)
-    lrc_plot.plot(ax=ax, alpha=0.8)
-    plt.savefig(output_pth)
-
-
-def explainer_plot(model, X_test, plot_type="bar"):
-    '''
-    '''
-    explainer = shap.TreeExplainer(model)
-    shap_values = explainer.shap_values(X_test)
-    shap.summary_plot(shap_values, X_test, plot_type=plot_type, show=False)
-    plt.title("Explainer bar chart")
-    plt.savefig(pcfg.explainer)
-
-
-
-def train_models(X_train, X_test, y_train, y_test):
-    '''
-    train, store model results: images + scores, and store models
-    input:
-              X_train: X training data
-              X_test: X testing data
-              y_train: y training data
-              y_test: y testing data
-    output:
-              None
-    '''
-    model_rfc = fit_random_forest_classifier(X_train, y_train, random_state=42)
-    y_train_preds, y_test_preds = predict_model(model_rfc, X_train, X_test)
-
-    model_name = 'Random Forest'
-    classification_report_image(y_train,
-                                y_test,
-                                y_train_preds,
-                                y_test_preds,
-                                model_name, pcfg.rfc_results)
-
-    model_lr = fit_logistic_regression(X_train, y_train)
-    y_train_preds, y_test_preds = predict_model(model_lr, X_train, X_test)
-
-    model_name = 'Logistic Regression'
-    classification_report_image(y_train,
-                                y_test,
-                                y_train_preds,
-                                y_test_preds,
-                                model_name, pcfg.logistic_results)
-
-    roc_curve_plot(
-        model_rfc,
-        model_lr,
-        X_test,
-        y_test,
-        pcfg.roc_curve_result)
-    
-    # Save explainer bar plot
-    explainer_plot(model_rfc, X_test, plot_type="bar")
-
-    save_model(model_lr, pcfg.lr_model)
-    save_model(model_rfc, pcfg.rfc_model)
 
 
 if __name__ == '__main__':
-    df = import_data(pcfg.data_file_path)
-    df = clean_data(df)
-
-    eda = [cls.MyFigure() for i in range(5)]
-    #eda[0].plot_histogram(df, 'Churn', 'Churn histogram',pcfg.churn_distribution)
-    #'Random Forest'eda[1].plot_histogram(df, 'Customer_Age', "Histogram - Customer Age" ,pcfg.customer_age_distribution)
-    #eda[2].plot_chart(df, 'Marital_Status', "Bar chart - Marital status", pcfg.marital_status_distribution, 'bar')
-    #eda[3].plot_distribution_chart(df, 'Total_Trans_Ct', "Distribution chart - Total transactions", pcfg.total_transation_distribution)
-    #eda[4].plot_heatmap(df, 'Heatmap', pcfg.heatmap )#annot=False, cmap='Dark2_r', linewidths = 2, pth=pcfg.heatmap)
+    '''
+        comman line tests of churn_classes
+    '''
+    ml_data = cls.DataEncoding()
+    ml_data.import_data(pcfg.data_file_path)
+    ml_data.clean_data('Churn')
+    
+    eda = [cls.MyFigure(figsize=(15,8)) for i in range(5)]
+    eda[0].plot_histogram(ml_data.data, 'Churn', 'Churn histogram',pcfg.churn_distribution)
+    eda[1].plot_histogram(ml_data.data, 'Customer_Age', "Histogram - Customer Age" ,pcfg.customer_age_distribution)
+    eda[2].plot_chart(ml_data.data, 'Marital_Status', "Bar chart - Marital status", pcfg.marital_status_distribution, 'bar')
+    eda[3].plot_distribution_chart(ml_data.data, 'Total_Trans_Ct', "Distribution chart - Total transactions", pcfg.total_transation_distribution)
+    eda[4].plot_heatmap(ml_data.data, 'Heatmap', pcfg.heatmap )#annot=False, cmap='Dark2_r', linewidths = 2, pth=pcfg.heatmap)
+        
 
     encoded_data = cls.DataEncoding()
-    encoded_data.encoder_helper(df, pcfg.cat_columns, pcfg.keep_columns, 'Churn')
+    encoded_data.encoder_helper(ml_data.data, pcfg.cat_columns, pcfg.keep_columns, 'Churn')
     featured_data = cls.FeatureEngineering()
     featured_data.engineering(encoded_data.X,encoded_data.y)
-    
-
+        
     model_lr = cls.MyLogisticRegression()
     model_lr.fit(featured_data.X_train, featured_data.y_train)    
-    y_train_preds, y_test_preds = model_lr.predict(featured_data.X_train, featured_data.X_test)
+    y_train_preds, y_test_preds = model_lr.predict(featured_data.X_train, featured_data.X_test, best_estimator=False)
     model_lr.save_model(pcfg.lr_model)
 
     
-    classification_figure_lr = cls.MyFigure()
+    classification_figure_lr = cls.MyFigure(figsize=(15,8))
     classification_figure_lr.classification_report(model_lr.name, featured_data.y_train, featured_data.y_test, y_train_preds, y_test_preds,pcfg.logistic_results)   
-
+    
 
     param_grid = {
         'n_estimators': [200, 500],
@@ -235,24 +63,27 @@ if __name__ == '__main__':
         'criterion': ['gini', 'entropy']
     }
 
-
+    # Declare model
     model_rfc =  cls.MyRandomForestClassifier(param_grid)
+    # Fit model
     model_rfc.fit(featured_data.X_train, featured_data.y_train)
-    y_train_preds, y_test_preds = model_lr.predict(featured_data.X_train, featured_data.X_test)
+    # Predict model
+    y_train_preds, y_test_preds = model_rfc.predict(featured_data.X_train, featured_data.X_test, best_estimator=True)
     model_rfc.save_model(pcfg.rfc_model)
      
-    classification_figure_rfc = cls.MyFigure()
+    classification_figure_rfc = cls.MyFigure(figsize=(15,8))
     classification_figure_rfc.classification_report(model_rfc.name, featured_data.y_train, featured_data.y_test, y_train_preds, y_test_preds,pcfg.rfc_results)   
 
-    ''' 
-    
-    
-    # Feature Engineering & training
-    X_train, X_test, y_train, y_test = perform_feature_engineering(X, y, response=None)
-    train_models(X_train, X_test, y_train, y_test)
 
-    # Save Features Importances
-    model_rfc = joblib.load(pcfg.rfc_model)
-    feature_importance_plot(model_rfc, X, pcfg.feature_importances)
-    # print(X_train.head())
-    '''
+    # Feature importances plot
+    importances_plot = cls.MyFigure(figsize=(15,8))
+    importances_plot.feature_importances(model_rfc.model, encoded_data.X, pcfg.feature_importances)
+    
+    roc = cls.MyFigure(figsize=(15,8))
+    roc.roc_curve_plot(model_lr.model, model_rfc.model.best_estimator_, featured_data.X_test, featured_data.y_test, pcfg.roc_curve_result)
+
+    expl = cls.MyFigure(figsize=(15,8))
+    expl.explainer_plot(model_rfc.model, featured_data.X_test, "bar", pcfg.explainer)
+
+    
+
