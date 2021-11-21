@@ -1,72 +1,111 @@
 import os
 import logging
 
-from churn_library import *
-from constants import DATA_FILE_PATH, LOG_FILE_PATH
-#import churn_library as cls
+# Project config and classes
+import projectconfig as cfg
+import churn_library as cls
+
 
 logging.basicConfig(
-    filename=LOG_FILE_PATH,
-    level = logging.INFO,
+    filename=cfg.log_file_path,
+    level=logging.INFO,
     filemode='w',
+    force=True,
     format='%(name)s - %(levelname)s - %(message)s')
 
-def test_import():
-	'''
-	test data import - this example is completed for you to assist with the other test functions
-	'''
-	try:
-		df = import_data(FILE_PATH)
-		logging.info("Testing import_data: SUCCESS")
-	except FileNotFoundError as err:
-		logging.error("Testing import_eda: The file wasn't found")
-		raise err
 
-	try:
-		assert df.shape[0] > 0
-		assert df.shape[1] > 0
-	except AssertionError as err:
-		logging.error("Testing import_data: The file doesn't appear to have rows and columns")
-		raise err
-
-
-def test_eda(perform_eda):
-	'''
-	test perform eda function
-	'''
-
-
-def test_encoder_helper():
+def test_building_model():
     '''
-    test encoder helper
+    Test of class DataEncoding()
     '''
-    df = import_data(FILE_PATH)
+    try:
+        data = cls.DataEncoding()
+        isinstance(data, cls.DataEncoding)
+        logging.info("Object DataEncoding() was created: SUCCESS")
+    except FileNotFoundError as err:
+        logging.error("Object DataEncoding() not created")
+        raise err
 
-def test_one_hot_encoder():
-    '''
-    test encoder helper
-    '''
-    df = import_data(FILE_PATH)
+    try:
+        data.import_data(cfg.data_file_path)
+        logging.info("Testing import_data: SUCCESS")
+    except AssertionError as err:
+        logging.info("Testing import_data - file not found: FAILED")
+        raise err
+
+    try:
+        assert data.data.shape[0] > 0
+        assert data.data.shape[1] > 0
+        logging.info("Testing shape of the imported data: SUCCESS")
+    except AssertionError as err:
+        logging.error("Testing import_data: The file doesn't appear to have rows and columns")
+        raise err
+    
+    try:
+        data.clean_data('Churn')
+        logging.info("Testing clean_data method: SUCCESS")
+    except AssertionError as err:
+        logging.error("Testing clean_data: issue during adding a new column and dropping two others")
+        raise err
+    
+    try:
+        data.encoder_helper(cfg.cat_columns, cfg.keep_columns, 'Churn')
+        logging.info("Testing encoder_helper method: SUCCESS")
+    except AssertionError as err:
+        logging.error("Testing encoder_helper: issue with setting X and y")
+        raise err
+
+    try:
+        featured = cls.FeatureEngineering()
+        isinstance(featured, cls.FeatureEngineering)
+        logging.info("Object FeatureEngineering() was created: SUCCESS")
+    except FileNotFoundError as err:
+        logging.error("Object FeatureEngineering() not created")
+        raise err
+
+    try:
+        featured.engineering(data.X, data.y)
+        logging.info("Testing engineering method: SUCCESS")
+    except AssertionError as err:
+        logging.error("Testing clean_data: issue during adding a new column and dropping two others")
+        raise err
+
+    try:
+        model_lr = cls.MyLogisticRegression()
+        isinstance(model_lr, cls.MyLogisticRegression)
+        logging.info("Object MyLogisticRegression() was created: SUCCESS")
+    except AssertionError as err:
+        logging.error("Object MyLogisticRegression() was not created:")
+        raise err
+
+    try:
+        featured.engineering(data.X, data.y)
+        logging.info("Testing engineering method: SUCCESS")
+    except AssertionError as err:
+        logging.error("Testing clean_data: issue during adding a new column and dropping two others")
+        raise err
 
 
-def test_perform_feature_engineering(perform_feature_engineering):
-	'''
-	test perform_feature_engineering
-	'''
+        
+    try:
+        param_grid = {
+            'n_estimators': [200, 500],
+            'max_features': ['auto', 'sqrt'],
+            'max_depth': [4, 5, 100],
+            'criterion': ['gini', 'entropy']
+        }
 
-
-def test_train_models(train_models):
-	'''
-	test train_models
-	'''
+        model_rfc = cls.MyRandomForestClassifier(param_grid)
+        isinstance(model_rfc, cls.MyRandomForestClassifier)
+        logging.info("Object MyRandomForestClassifier() was created: SUCCESS")
+    except AssertionError as err:
+        logging.error("Object MyRandomForestClassifier() was not created:")
+        raise err
 
 
 if __name__ == "__main__":
-    #pass
-    test_import()
-    #test_eda(perform_eda):
-    test_encoder_helper()
-    test_one_hot_encoder()
-    #test_perform_feature_engineering(perform_feature_engineering):
-    #test_train_models(train_models):
+    pass
+    # test_eda(perform_eda):
+    # test_perform_feature_engineering(perform_feature_engineering):
+    # test_train_models(train_models):
 
