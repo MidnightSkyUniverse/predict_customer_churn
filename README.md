@@ -41,9 +41,13 @@ for explainer chart
 
 ### Execution of the program
 
-	Use churn_notebook.ipynb for sample usage example
-	Please note that jupyter notebook does not save any output, while the churn_library.py
-	executed from command line would require the folders created for images and models
+	Use **churn_notebook.ipynb** for sample usage example
+
+	All classes and methods are defined in **churn_library.py**
+
+	Please note that jupyter notebook does not save any output
+
+	There is also **churn_run.py** script that executes all methods and save images and models. 
 
 # Testing
 
