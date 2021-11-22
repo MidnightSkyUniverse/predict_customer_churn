@@ -25,8 +25,15 @@ sns.set()
 class TrainModel():
     '''
 
-    This class has three methods: fit, predict and save_model
-    Model classes for Logistic Regression and Random Forest Classifier inherits from TrainModel
+    This class has  methods to train, save and load models:
+        - fit()
+        - predict()
+        - save_model()
+        - load_model()
+
+    There are two classes that inherits from this class:
+        1. MyLogisticRegression()
+        2. MyRandomForestClassifier()
 
     '''
 
@@ -34,12 +41,29 @@ class TrainModel():
         self.model = None
 
     def fit(self, X_train, y_train):
+        '''
+
+        Fit model
+
+        input:
+            X_train, y_train data
+
+        '''
         self.model.fit(X_train, y_train)
 
     def predict(self, X_train, X_test, is_best_estimator):
         '''
-        X: data
-        y: target
+
+        Predict target based on train and test data.
+
+        input:
+
+            X_train: train data
+            X_test: test data
+            is_best_estimator: bool value, best_estimator_ is used for Random Forest
+
+        outout:
+            y_train_preds, y_test_preds: predictions
 
         '''
         if is_best_estimator:
@@ -55,21 +79,15 @@ class TrainModel():
         '''
              saves model to ./models as .pkl file
                 input:
-                    model: model object
-                    output_pth: path to store the model
-                output:
-                    None
+                    pth: path to store the model
         '''
         joblib.dump(self.model, pth)
 
-    def load_model(self,pth):
+    def load_model(self, pth):
         '''
-            get model from ./models as .pkl file
+            load model from ./models as .pkl file
                 input:
-                    model: model object
-                    output_pth: path to store the model
-                output:
-                    None
+                    pth: path to store the model
         '''
         self.model = joblib.load(pth)
 
@@ -92,7 +110,6 @@ class MyRandomForestClassifier(TrainModel):
     '''
 
         Class creates Random Forest Classifier model object
-        It has two methods to define best_estimator_ and feature_importances_
 
     '''
 
@@ -108,6 +125,12 @@ class MyRandomForestClassifier(TrainModel):
 
 class DataEncoding():
     '''
+
+        That class combines methods responsible for data processing in this project
+        - import_data () from csv file
+        - clean_data()
+        - encoder_helper()
+
     '''
 
     def __init__(self):
@@ -129,6 +152,8 @@ class DataEncoding():
     def clean_data(self, new_col='Churn'):
         '''
         add column Churn that encodes column Existing Customer with 0 and 1
+        In additon the method drops two columns that keep target data
+
             input:
                 df: pandas dataframe
             output:
@@ -145,17 +170,20 @@ class DataEncoding():
 
     def encoder_helper(self, category_lst, keep_cols, response):
         '''
+
         helper function to turn each categorical column into a new column with
         propotion of churn for each category - associated with cell 15 from the notebook
 
         input:
             df: pandas dataframe
             category_lst: list of columns that contain categorical features
+            keep_cols: columns that will be part of the output dataframe
             response: string of response name [optional argument that could be used
                     for naming variables or index y column]
 
         output:
             df: pandas dataframe with new columns for
+
         '''
         for col in category_lst:
             col_lst = []
@@ -171,6 +199,7 @@ class DataEncoding():
 
     def one_hot_encoder(self, data, category_lst, response):
         '''
+
         helper function to turn each categorical column into a new column with one-hot encoder
 
         input:
@@ -181,6 +210,7 @@ class DataEncoding():
 
         output:
             df: pandas dataframe with new columns for
+
         '''
         enc = OneHotEncoder(handle_unknown='ignore', sparse=False)
         cols_encoded = pd.DataFrame(enc.fit_transform(data[category_lst]))
@@ -192,12 +222,7 @@ class DataEncoding():
 
 class FeatureEngineering():
     '''
-        input:
-              df: pandas dataframe
-              response: string of response name [optional argument that could be used
-                        for naming variables or index y column]
-
-        output:
+        Class splits the data into
               X_train: X training data
               X_test: X testing data
               y_train: y training data
@@ -205,8 +230,6 @@ class FeatureEngineering():
     '''
 
     def __init__(self):
-        #    '''
-        #    '''
         self.X_train = None
         self.X_test = None
         self.y_train = None
@@ -227,18 +250,16 @@ class FeatureEngineering():
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             X_data, y_data, test_size=test_size, random_state=random_state)
 
-    def function_placeholder(self):
-        pass
 
 
 class MyFigure(plt.Figure):
     '''
-    perform eda on df and save figures to images folder
-    input:
-            df: pandas dataframe
 
-    output:
-            None
+    This class has methods responsible for generating images from
+        - charts
+        - reports
+    All charts and reports are automatically generated to a file
+
     '''
 
     def __init__(self, *args, **kwargs):
@@ -247,23 +268,51 @@ class MyFigure(plt.Figure):
         self.fig.figure(figsize=kwargs['figsize'])
 
     def save_figure(self, pth):
+        '''
+        Method saves figure under given path and deletes the object
+            input:
+                pth: file path
+        '''
         self.fig.savefig(pth, bbox_inches='tight')
         self.fig.clf()
 
     def plot_histogram(self, data, col, title, pth):
-
+        '''
+        Method plots histogram of given column data
+            input:
+                data: data
+                col: column name
+                title: chart title
+                pth: path to save the chart as figure
+        '''
         data[col].hist()
         self.fig.title(title)
         self.save_figure(pth)
 
     def plot_chart(self, data, col, title, pth, chart_type='bar'):
-
+        '''
+        Method plits any chart that can be defined with chart_type.
+        Default type is bar chart
+            input:
+                data: data
+                col: column which data is being presented
+                title: chart title
+                pth: path to save the chart as figure
+        '''
         data[col].value_counts('normalize').plot(kind=chart_type)
         self.fig.title(title)
         self.save_figure(pth)
 
     def plot_distribution_chart(self, data, col, title, pth):
+        '''
+        Method draws distribution chart
+            input:
+                data: data
+                col: column which data is being presented
+                title: chart title
+                pth: path to save the chart as figure
 
+        '''
         sns.displot(data[col])
         self.fig.title(title)
         self.save_figure(pth)
@@ -276,6 +325,15 @@ class MyFigure(plt.Figure):
             cmap='Dark2_r',
             annot=False,
             linewidths=2):
+        '''
+        Method draws heatmap
+            input:
+                data: data
+                title: chart title
+                pth: path to save the chart as figure
+
+        '''
+
         sns.heatmap(data.corr(), annot=annot, cmap=cmap, linewidths=linewidths)
         self.fig.title(title)
         self.save_figure(pth)
