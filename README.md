@@ -13,7 +13,8 @@ customer churn using two models:
 ## Requirements
 
 There is requirements.txt uploaded to the repository
-The program was installed on anaconda
+The program was installed on anaconda and shap library had to be installed as requirement 
+for explainer chart
 
 ## Prepare environment
 
@@ -33,7 +34,10 @@ The program was installed on anaconda
 	
 		https://www.kaggle.com/sakshigoyal7/credit-card-customers/code
 
-	and stored under ./data and the path updated in project config file
+	and stored under ./data and the path updated in project config file:
+	
+		data_file_path = './data/BankChurners.csv'
+
 
 ### Execution of the program
 
