@@ -1,0 +1,27 @@
+2021-11-22 13:58:30,519  Object DataEncoding() was created: SUCCESS
+2021-11-22 13:58:30,556  Method import_data: SUCCESS
+2021-11-22 13:58:30,556  Testing shape of the imported data: SUCCESS
+2021-11-22 13:58:30,565  Method clean_data method: SUCCESS
+2021-11-22 13:58:31,667  Method encoder_helper method: SUCCESS
+2021-11-22 13:58:31,667  Object FeatureEngineering() was created: SUCCESS
+2021-11-22 13:58:31,672  Method engineering method: SUCCESS
+2021-11-22 13:58:31,672  Object MyLogisticRegression() was created: SUCCESS
+2021-11-22 13:58:31,789  Method Logistic Regression fit method: SUCCESS
+2021-11-22 13:58:31,795  Method Logistic Regression predict method: SUCCESS
+2021-11-22 13:58:31,797  Method Logistic Regression save method: SUCCESS
+2021-11-22 13:58:31,797  Object MyRandomForestClassifier() was created: SUCCESS
+2021-11-22 14:03:58,401  Method Random Forest Classifier fit method: SUCCESS
+2021-11-22 14:03:58,692  Method Random Forest Classifier predict method: SUCCESS
+2021-11-22 14:03:58,892  Method Random Forest Classifier save method: SUCCESS
+2021-11-22 14:03:58,894  Method Logistic Regression save method: SUCCESS
+2021-11-22 14:03:58,896  Method Logistic Regression save method: SUCCESS
+2021-11-22 14:03:59,024  Method Random Forest Classifier save method: SUCCESS
+2021-11-22 14:03:59,085  Figure plot_histogram: SUCCESS
+2021-11-22 14:03:59,098  NumExpr defaulting to 4 threads.
+2021-11-22 14:03:59,155  Figure plot_chart: SUCCESS
+2021-11-22 14:03:59,501  Figure plot_distribution_chart: SUCCESS
+2021-11-22 14:03:59,979  Figure plot_heatmap: SUCCESS
+2021-11-22 14:04:00,167  Figure classification_report: SUCCESS
+2021-11-22 14:04:00,285  Figure feature_importances: SUCCESS
+2021-11-22 14:04:00,440  Figure roc_curve_plot: SUCCESS
+2021-11-22 14:05:55,401  Figure explainer_plot: SUCCESS

@@ -195,8 +195,7 @@ def test_building_model():
         eda.plot_histogram(
             data.data,
             'Churn',
-            'Churn histogram',
-            cfg.churn_distribution)
+            'Churn histogram')
         eda.clf()
         logging.info("Figure plot_histogram: SUCCESS")
     except AssertionError as err:
@@ -209,7 +208,6 @@ def test_building_model():
             data.data,
             'Marital_Status',
             "Bar chart - Marital status",
-            cfg.marital_status_distribution,
             'bar')
         eda.clf()
         logging.info("Figure plot_chart: SUCCESS")
@@ -222,8 +220,7 @@ def test_building_model():
         eda.plot_distribution_chart(
             data.data,
             'Total_Trans_Ct',
-            "Distribution chart - Total transactions",
-            cfg.total_transation_distribution)
+            "Distribution chart - Total transactions")
         eda.clf()
         logging.info("Figure plot_distribution_chart: SUCCESS")
     except AssertionError as err:
@@ -232,7 +229,7 @@ def test_building_model():
 
     try:
         eda = cls.MyFigure(figsize=(15, 8))
-        eda.plot_heatmap(data.data, 'Heatmap', cfg.heatmap)
+        eda.plot_heatmap(data.data, 'Heatmap')
         eda.clf()
         logging.info("Figure plot_heatmap: SUCCESS")
     except AssertionError as err:
@@ -246,8 +243,7 @@ def test_building_model():
             featured.y_train,
             featured.y_test,
             y_train_preds_lr,
-            y_test_preds_lr,
-            cfg.logistic_results)
+            y_test_preds_lr)
         eda.clf()
         logging.info("Figure classification_report: SUCCESS")
     except AssertionError as err:
@@ -258,8 +254,7 @@ def test_building_model():
         eda = cls.MyFigure(figsize=(15, 8))
         eda.feature_importances(
             model_rfc.model,
-            data.X,
-            cfg.feature_importances)
+            data.X)
         eda.clf()
         logging.info("Figure feature_importances: SUCCESS")
     except AssertionError as err:
@@ -272,8 +267,7 @@ def test_building_model():
             model_lr.model,
             model_rfc.model.best_estimator_,
             featured.X_test,
-            featured.y_test,
-            cfg.roc_curve_result)
+            featured.y_test)
         eda.clf()
         logging.info("Figure roc_curve_plot: SUCCESS")
     except AssertionError as err:
@@ -285,8 +279,7 @@ def test_building_model():
         eda.explainer_plot(
             model_rfc.model,
             featured.X_test,
-            "bar",
-            cfg.explainer)
+            "bar")
         eda.clf()
         logging.info("Figure explainer_plot: SUCCESS")
     except AssertionError as err:
