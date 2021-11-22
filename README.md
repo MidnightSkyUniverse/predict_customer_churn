@@ -12,8 +12,8 @@ customer churn using two models:
 
 ## Requirements
 
-There is requirements.txt uploaded to the repository
-The program was installed on anaconda and shap library had to be installed as requirement 
+There is **requirements.txt** uploaded to the repository
+The program was installed on anaconda and **shap library** had to be installed as requirement 
 for explainer chart
 
 ## Prepare environment
