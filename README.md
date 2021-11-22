@@ -18,36 +18,36 @@ for explainer chart
 
 ## Prepare environment
 
-	File projectconfig.py contains file paths to where the reports and charts will be stored.
-	Folder to store models and figures must be create prior to execution of the project
+File projectconfig.py contains file paths to where the reports and charts will be stored.
+Folder to store models and figures must be create prior to execution of the project
 	- ./images/eda
 	- ./images/results
 	- ./models
 	- ./logs	
 	- ./data 
-	However if you decide to run the project from jupyter, the charts and reports are 
-	printed to the screen and are not saved
+However if you decide to run the project from jupyter, the charts and reports are 
+printed to the screen and are not saved
 
 ### Dataset
 
-	Dataset need to be downloaded from Kaggle:
+Dataset need to be downloaded from Kaggle:
 	
 		https://www.kaggle.com/sakshigoyal7/credit-card-customers/code
 
-	and stored under ./data and the path updated in project config file:
+and stored under ./data and the path updated in project config file:
 	
 		data_file_path = './data/BankChurners.csv'
 
 
 ### Execution of the program
 
-	Use **churn_notebook.ipynb** for sample usage example
+Use **churn_notebook.ipynb** for sample usage example
 
-	All classes and methods are defined in **churn_library.py**
+All classes and methods are defined in **churn_library.py**
 
-	Please note that jupyter notebook does not save any output
+Please note that jupyter notebook does not save any output
 
-	There is also **churn_run.py** script that executes all methods and save images and models. 
+There is also **churn_run.py** script that executes all methods and save images and models. 
 
 # Testing
 
