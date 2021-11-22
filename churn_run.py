@@ -1,5 +1,6 @@
 '''
-    Project: 'Customer Churn Project' for Udacity nanodegree program
+    This is a script that exacutes all project from command line.
+    It will save the images and models which can be later viewed
 
     Date: Nov 2021
 
