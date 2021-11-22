@@ -4,8 +4,8 @@ This is simple machine learning program for Udacity DevOps training.
 The code is based on the code provided by Udacity.
 The project is called 'Customer Churn', it uses kaggle dataset to predict 
 customer churn using two models:
-	- Random Forest Classifier
-	- Logistic Regression
+- Random Forest Classifier
+- Logistic Regression
 
 
 # How To Use This

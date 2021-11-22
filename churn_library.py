@@ -276,20 +276,18 @@ class MyFigure(plt.Figure):
         self.fig.savefig(pth, bbox_inches='tight')
         self.fig.clf()
 
-    def plot_histogram(self, data, col, title, pth):
+    def plot_histogram(self, data, col, title):
         '''
         Method plots histogram of given column data
             input:
                 data: data
                 col: column name
                 title: chart title
-                pth: path to save the chart as figure
         '''
         data[col].hist()
         self.fig.title(title)
-        self.save_figure(pth)
 
-    def plot_chart(self, data, col, title, pth, chart_type='bar'):
+    def plot_chart(self, data, col, title, chart_type='bar'):
         '''
         Method plits any chart that can be defined with chart_type.
         Default type is bar chart
@@ -297,31 +295,26 @@ class MyFigure(plt.Figure):
                 data: data
                 col: column which data is being presented
                 title: chart title
-                pth: path to save the chart as figure
         '''
         data[col].value_counts('normalize').plot(kind=chart_type)
         self.fig.title(title)
-        self.save_figure(pth)
 
-    def plot_distribution_chart(self, data, col, title, pth):
+    def plot_distribution_chart(self, data, col, title):
         '''
         Method draws distribution chart
             input:
                 data: data
                 col: column which data is being presented
                 title: chart title
-                pth: path to save the chart as figure
 
         '''
         sns.displot(data[col])
         self.fig.title(title)
-        self.save_figure(pth)
 
     def plot_heatmap(
             self,
             data,
             title,
-            pth,
             cmap='Dark2_r',
             annot=False,
             linewidths=2):
@@ -330,21 +323,18 @@ class MyFigure(plt.Figure):
             input:
                 data: data
                 title: chart title
-                pth: path to save the chart as figure
 
         '''
 
         sns.heatmap(data.corr(), annot=annot, cmap=cmap, linewidths=linewidths)
         self.fig.title(title)
-        self.save_figure(pth)
 
-    def feature_importances(self, model, X_data, pth):
+    def feature_importances(self, model, X_data):
         '''
         creates and stores the feature importances in pth
         input:
             model: model object containing feature_importances_
             X_data: pandas dataframe of X values
-            output_pth: path to store the figure
 
         output:
              None
@@ -368,13 +358,11 @@ class MyFigure(plt.Figure):
         self.fig.xticks(range(X_data.shape[1]), names, rotation=90)
 
         # Save figure
-        self.save_figure(pth)
 
     def classification_report(self, model_name, y_train,
                               y_test,
                               y_train_preds,
-                              y_test_preds,
-                              pth):
+                              y_test_preds):
         '''
         produces classification report for training and testing results and stores report as image
         in images folder
@@ -398,15 +386,13 @@ class MyFigure(plt.Figure):
         self.fig.text(0.01, 0.01, str(classification_report(y_test, y_test_preds)), {
             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
         self.fig.axis('off')
-        self.save_figure(pth)
 
-    def roc_curve_plot(self, model_1, model_2, X_test, y_test, pth):
+    def roc_curve_plot(self, model_1, model_2, X_test, y_test):
         '''
         creates and stores the feature importances in pth
         input:
             model: model object containing feature_importances_
             X_data: pandas dataframe of X values
-            output_pth: path to store the figure
 
         output:
              None
@@ -414,9 +400,8 @@ class MyFigure(plt.Figure):
         ax = plt.gca()
         lrc_plot = plot_roc_curve(model_1, X_test, y_test, ax=ax, alpha=0.8)
         lrc_plot = plot_roc_curve(model_2, X_test, y_test, ax=ax, alpha=0.8)
-        self.save_figure(pth)
 
-    def explainer_plot(self, model, X_test, plot_type, pth):
+    def explainer_plot(self, model, X_test, plot_type):
         '''
 
         This chart uses shap to add explainer
@@ -426,7 +411,6 @@ class MyFigure(plt.Figure):
         shap_values = explainer.shap_values(X_test)
         shap.summary_plot(shap_values, X_test, plot_type=plot_type, show=False)
         self.fig.title("Explainer bar chart")
-        self.save_figure(pth)
 
 
 if __name__ == '__main__':

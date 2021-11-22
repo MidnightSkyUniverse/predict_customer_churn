@@ -1,3 +1,9 @@
+'''
+    Tests of classes defined in churn_library.py for customer churn analyses
+
+    to execute the tests use 'pyliny file_name.py'
+
+'''
 import logging
 
 # Project config and classes
@@ -10,7 +16,8 @@ logging.basicConfig(
     level=logging.INFO,
     filemode='w',
     force=True,
-    format='%(asctime)s: %(levelname)s - %(message)s')
+    #format='%(asctime)s: %(levelname)s - %(message)s')
+    format='%(asctime)-15s  %(message)s')
 
 
 def test_building_model():

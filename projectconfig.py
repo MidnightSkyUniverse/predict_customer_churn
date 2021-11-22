@@ -1,11 +1,11 @@
 """
-    File: constants.py
+    File: projectconfig.py
 
-    Constant values for churn_library module
+    Predefined values for churn_library module
+
 """
 data_file_path = './data/BankChurners.csv'
 log_file_path = './logs/churn_library.log'
-#results_pth ='./images/results'
 logistic_results = './images/results/logistic_results.png'
 rfc_results = './images/results/rf_results.png'
 roc_curve_result = './images/results/roc_curve_result.png'
@@ -14,8 +14,8 @@ rfc_model = './models/rfc_model.pkl'
 lr_model = './models/logistic_model.pkl'
 churn_distribution = './images/eda/churn_distribution.png'
 customer_age_distribution = './images/eda/customer_age_distribution.png'
-heatmap = './images/eda/churn_distribution.png'
-material_status_distribution = './images/eda/material_status_distribution.png'
+heatmap = './images/eda/heatmap.png'
+marital_status_distribution = './images/eda/marital_status_distribution.png'
 total_transation_distribution = './images/eda/total_transation_distribution.png'
 explainer = './images/results/explainer.png'
 
