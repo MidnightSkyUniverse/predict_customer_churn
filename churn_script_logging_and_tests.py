@@ -1,7 +1,7 @@
 '''
     Tests of classes defined in churn_library.py for customer churn analyses
 
-    to execute the tests use 'pyliny file_name.py'
+    to execute the tests use 'pytest churn_script_logging_and_tests.py'
 
 '''
 import logging
