@@ -18,13 +18,14 @@ for explainer chart
 
 ## Prepare environment
 
-File projectconfig.py contains file paths to where the reports and charts will be stored.
+File **projectconfig.py** contains file paths to where the reports and charts will be stored.
 Folder to store models and figures must be create prior to execution of the project
-	- ./images/eda
-	- ./images/results
-	- ./models
-	- ./logs	
-	- ./data 
+- ./images/eda
+- ./images/results
+- ./models
+- ./logs	
+- ./data 
+
 However if you decide to run the project from jupyter, the charts and reports are 
 printed to the screen and are not saved
 
