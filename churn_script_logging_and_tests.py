@@ -17,7 +17,7 @@ logging.basicConfig(
     filemode='w',
     force=True,
     #format='%(asctime)s: %(levelname)s - %(message)s')
-    format='%(asctime)s  %(message)s')
+    format='%(name)s - %(levelname)s - %(message)s')
 
 
 def test_building_model():
